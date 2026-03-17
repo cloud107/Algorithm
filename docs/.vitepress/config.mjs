@@ -73,6 +73,11 @@ export default {
           collapsed: true
         },
         {
+          text: '0x50 动态规划',
+          link: '/guide/0x50-dynamic-program',
+          collapsed: true
+        },
+        {
           text: '0x60 图论',
           link: '/guide/0x60-graph',
           collapsed: true
