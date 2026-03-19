@@ -81,6 +81,11 @@ export default {
           text: '0x60 图论',
           link: '/guide/0x60-graph',
           collapsed: true
+        },
+        {
+          text: '习题笔记',
+          link: '/guide/Exercise Notes',
+          collapsed: true
         }
       ]
     },
