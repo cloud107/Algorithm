@@ -140,3 +140,89 @@ signed main() {
 }
 ```
 - 复盘: 之所以选这道简单题是为了提醒自己模拟时一定要完全按照题目的要求,我当时每加一个节点就更新一次最大值,结果在一行还没结束的时候就更新了最大值,导致结果错.
+
+### <a href="https://www.lanqiao.cn/problems/185/learning/" target="_blank" rel="noreferrer">修改数组</a>
+- 来源: 蓝桥杯
+- 题目描述: 给定一个数组,每加入一个数时,检查在这个数之前数组中是否存在和这个数相等的数,如果存在就把这个数加一,直到不存在为止,输出最后的数组
+- 核心思路: 
+    - 正解:并查集,每加入一个数就把这个数修改成它所在集合的代表元,然后把修改后的值和它加一的值合并
+    - 另解(我当时想到的解法):树状数组+二分,构造一个树状数组记录每个数是否存在,存在为1不存在为0,由于树状数组可以快速求出前缀和,当我们得到一个新数a[i]时,我们用二分查找找到一个位置pos使得pos满足sum[pos]-sum[a[i]-1]==1且pos最小,说明a[i]到pos-1的闭区间内的数都存在,所以我们把a[i]修改成pos,然后把pos这个数标记为存在(树状数组中对应位置加1)
+- 核心代码
+    - 并查集解法
+    ```cpp
+    #include<bits/stdc++.h>
+    using namespace std;
+
+    const int N = 100010, M = 1000010;
+
+    int n,a[N];
+    int fa[M];
+
+    int get(int x) {
+        if(fa[x] == x) return x;
+        return fa[x] = get(fa[x]);
+    }
+
+    void merge(int x,int y) {
+        int fx = get(x), fy = get(y);
+        fa[fx] = fy;
+    }
+
+    int main() {
+        cin>>n;
+        for(int i = 1; i<=n; i++) cin>>a[i];
+        for(int i = 1; i<M;i++) fa[i] = i;
+        for(int i = 1; i<=n; i++) {
+            // cout<<a[i]<<" "<<get(a[i])<<endl;
+            a[i] = get(a[i]);
+            merge(a[i],a[i]+1);
+        }
+        for(int i = 1; i<=n;i++) cout<<a[i]<<" ";
+        cout<<endl;
+        return 0;
+    }
+    ```
+    - 树状数组解法
+    ```cpp
+    #include<bits/stdc++.h>
+    using namespace std;
+
+    const int N = 100010,M = 200010;
+
+    int a[N],n;
+    int tr[M];
+
+    void add(int x) {
+        for(int i = x; i<M; i+=i&-i) tr[i]++;
+    }
+
+    int ask(int x) {
+        int res = 0;
+        for(int i = x; i; i-=i&-i) res += tr[i];
+        return res;
+    }
+
+    bool check(int l,int r) {
+        int res = ask(r) - ask(l-1);
+        if(r-l+1>res) return 1;
+        else return 0;
+    }
+
+    int main() {
+        cin>>n;
+        for(int i = 1; i<=n; i++) cin>>a[i];
+        for(int i = 1; i<=n; i++) {
+            int l = a[i]-1,r = M;
+            while(l+1<r) {
+                int mid = l+r>>1;
+                if(check(a[i],mid)) r = mid;
+                else l = mid;
+            }
+            a[i] = r;
+            add(a[i]);
+        }
+        for(int i = 1; i<=n;i++) cout<<a[i]<<" ";
+        return 0;
+    }
+    ```
+- 复盘: 这题的正解是并查集,显然树状数组+二分的写法在代码量和时间复杂度上完败,但这是我自己想到的解法,增强了我的信心
