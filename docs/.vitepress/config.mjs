@@ -81,7 +81,7 @@ export default {
     },
 
     // ➕ 新增：标题导航相关配置
-    outline: 'deep',
+    outline: [1, 6],
     outlineLabel: '本页目录',
     
     // 可选：优化滚动体验（避免标题被导航栏遮挡）
