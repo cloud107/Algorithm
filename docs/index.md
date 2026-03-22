@@ -6,7 +6,7 @@ hero:
   text: "题解与学习笔记"
   tagline: 记录算法学习之路，从入门到进阶
   image:
-    src: /images/image.png
+    src: /public/images/title.jpg
     alt: Algorithm Logo
   actions:
     - theme: brand
