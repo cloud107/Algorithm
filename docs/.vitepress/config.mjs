@@ -20,16 +20,6 @@ export default {
     }
   },
   
-  // 添加数学公式 CSS 样式
-  // head: [
-  //   [
-  //     'link',
-  //     {
-  //       rel: 'stylesheet',
-  //       href: 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css'
-  //     }
-  //   ]
-  // ],
   
   // 部署到 GitHub Pages 时需要配置（仓库名为 Algorithm）
   base: '/Algorithm/',
@@ -89,6 +79,13 @@ export default {
         }
       ]
     },
+
+    // ➕ 新增：标题导航相关配置
+    outline: 'deep',
+    outlineLabel: '本页目录',
+    
+    // 可选：优化滚动体验（避免标题被导航栏遮挡）
+    scrollOffset: 120,
     
     // 页脚
     footer: {
