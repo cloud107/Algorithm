@@ -1,0 +1,37 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🚀 Git: 提交并推送 (直连)",
+      "type": "shell",
+      "command": "gpush", 
+      "args": ["${input:commitMessage}"],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "🌐 Git: 提交并推送 (开代理)",
+      "type": "shell",
+      "command": "gpush",
+      "args": ["${input:commitMessage}", "on"],
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "请输入本次提交的信息 (Commit Message):",
+      "default": "feat: update"
+    }
+  ]
+}
