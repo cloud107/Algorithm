@@ -225,4 +225,40 @@ signed main() {
         return 0;
     }
     ```
-- 复盘: 这题的正解是并查集,显然树状数组+二分的写法在代码量和时间复杂度上完败,但这是我自己想到的解法,增强了我的信心
+- 复盘: 这题的正解是并查集,显然树状数组+二分的写法在代码量和时间复杂度上完败,但这是我自己想到的解法,我觉得很有意义
+
+### <a href="https://sim.csp.thusaac.com/contest/list" target="_blank" rel="noreferrer">梦境巡查</a>
+- 来源: CCF-CSP认证
+- 题目描述: 给定一个长为n+1的数列a(含a[0]),一个长为n的数列b(不含b[0]),从0开始,每向前走一步就-a[i]+b[i],求出i∈[1,n],当b[i]置为0时,得到的数列中的最小值
+- 标签: 前缀和,区间最值
+- 核心思路:
+    - 每次把一个b[i]置零,只会对后面的位置产生影响,所以我们可以对每一个i先求出前缀和数组1~i的最小值,再求出前缀和数组i~n的最小值,当把b[i]置为0时,前缀和数组1~i的最小值不变,前缀和数组i~n的最小值减小b[i],
+- 核心代码:
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+
+const int N = 100010;
+
+int a[N],b[N],sum[N],pre_max[N],post_max[N],n;
+
+int main() {
+    cin>>n;
+    for(int i = 0; i<=n; i++) cin>>a[i];
+    for(int i = 1; i<=n; i++) cin>>b[i];
+    for(int i = 1; i<=n+1;i++) {
+        sum[i] = sum[i-1]+a[i-1]-b[i-1];
+        pre_max[i] = max(pre_max[i-1],sum[i]);
+    }
+    post_max[n+1] = sum[n+1];
+    for(int i = n;i>0;i--) {
+        post_max[i] = max(post_max[i+1],sum[i]);
+    }
+    for(int i = 2; i<=n+1;i++) {
+        int ans = max(pre_max[i],post_max[i]+b[i-1]);
+        cout<<ans<<" ";
+    }
+    return 0;
+}
+```
+- 复盘: 当时看到区间最值只想到线段树和ST表,没有考虑到这题两个区间的边界都有一边固定

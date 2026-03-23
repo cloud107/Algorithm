@@ -76,6 +76,11 @@ export default {
           text: '习题笔记',
           link: '/guide/Exercise Notes',
           collapsed: true
+        },
+        {
+          text: '常用模板',
+          link: '/guide/template',
+          collapsed: true
         }
       ]
     },
