@@ -643,3 +643,104 @@ signed main() {
 ```
 - 易错点:
     - 扫描线最容易错的地方就是线段树维护的到底是点还是线,这道题是点,上一道题是线
+
+
+# 主席树(可持久化线段树)
+1. 可持久化线段树是一种权值线段树
+2. 主席树用于维护一个序列的历史版本,每次修改都会生成一个新的版本,为了节约空间,每个版本的线段树节点可以共享未修改的部分,因此空间复杂度为O(nlogn)
+3. 共享节点决定了要动态开点,而动态开点就决定了主席树不能像像普通线段树一样乘二得到左儿子,而是每个节点要记录左右儿子的编号
+
+### 刷题笔记
+#### 造题计划（上）
+- 来源: CCF-CSP认证
+- 题目大意: 给定一颗树,每个节点有一个权值,进行m次操作,每次操作是给定两个节点u和v,求u到v路径上权值的mex值
+- 核心思路:
+    - 对每一个节点建一颗主席树,主席树维护的是从根节点到当前节点路径上权值的出现次数,每次修改时在父节点的基础上修改当前节点的权值,查询时将u+v-lca(u,v)-fa[lca(u,v)]四颗树进行查询,根据出现次数判断mex值
+- 核心代码
+```
+#include<bits/stdc++.h>
+using namespace std;
+#define lc(x) tr[x].lson
+#define rc(x) tr[x].rson
+
+const int N = 200010, M = 20;
+
+int n,m;
+int a[N];
+int head[N],nex[2*N],ver[2*N],tot;
+int fa[N][M],dep[N];
+
+struct ZXS{
+    int lson,rson;
+    int s;
+}tr[N*M];
+int root[N], cnt;
+
+void add(int x,int y) {
+    ver[++tot] = y;
+    nex[tot] = head[x];
+    head[x] = tot;
+}
+
+void insert(int x, int &y, int l, int r, int w) {
+    y = ++cnt;
+    tr[y] = tr[x];
+    tr[y].s++;
+    if(l==r) return ;
+    int m = l+r>>1;
+    if(w<=m) insert(lc(x),lc(y),l,m,w);
+    else insert(rc(x),rc(y),m+1,r,w);
+}
+
+void dfs(int x,int p) {
+    fa[x][0] = p;
+    dep[x] = dep[p]+1;
+    for(int i = 1; i<M; i++) fa[x][i] = fa[fa[x][i-1]][i-1];
+    insert(root[p],root[x],0,n,a[x]);
+    for(int i = head[x]; i; i=nex[i]) {
+        int y = ver[i];
+        if(y==p) continue;
+        dfs(y,x);
+    }
+}
+
+int lca(int x,int y) {
+    if(dep[x]<dep[y]) swap(x,y);
+    for(int i = M-1; i>=0; i--) {
+        if(dep[fa[x][i]]>=dep[y]) x = fa[x][i];
+    }
+    if(x==y) return x;
+    for(int i = M-1; i>=0;i--) {
+        if(fa[x][i]!=fa[y][i]) x=fa[x][i],y = fa[y][i];
+    }
+    return fa[x][0];
+}
+
+int query(int x,int y,int f,int p,int l,int r) {
+    if(l==r) return l;
+    int t = tr[lc(x)].s + tr[lc(y)].s - tr[lc(f)].s - tr[lc(p)].s;
+    int m = l+r>>1;
+    if(t<m-l+1) return query(lc(x),lc(y),lc(f),lc(p),l,m);
+    else return query(rc(x),rc(y),rc(f),rc(p),m+1,r);
+}
+
+int main() {
+    ios::sync_with_stdio(0); cin.tie(0); cout.tie(0);
+    cin>>n>>m;
+    for(int i = 1; i<=n; i++) cin>>a[i];
+    for(int i = 1; i<n; i++) {
+        int x,y; cin>>x>>y;
+        add(x,y);
+        add(y,x);
+    }
+    dfs(1,0);
+    while(m--) {
+        int x,y; cin>>x>>y;
+        int f = lca(x,y);
+        cout<< query(root[x],root[y],root[f],root[fa[f][0]],0,n)<<'\n';
+    }
+    return 0;
+}
+```
+- 易错点:
+    - 不要把节点的编号和主席树的编号搞混了,节点的编号是1~n,主席树的编号是动态开点生成的
