@@ -89,3 +89,101 @@ struct BigInt {
     }
 };
 ```
+
+# KMP
+```
+#include<bits/stdc++.h>
+using namespace std;
+
+const int N = 1000010;
+
+string s1,s2;
+int len1,len2;
+int nex[N],f[N];
+
+int main() {
+    cin>>s1>>s2;
+    len1 = s1.length();
+    len2 = s2.length();
+    s1 = '#' + s1;
+    s2 = '#' + s2;
+    nex[1] = 0;
+    for(int i = 2, j = 0; i<=len2; i++) {
+        while(j>0 && s2[i] != s2[j+1]) j = nex[j];
+        if(s2[i]==s2[j+1]) j++;
+        nex[i] = j; 
+    }
+    for(int i = 1, j = 0; i<=len1; i++) {
+        // cout<<j<<" "<<nex[j]<<endl;
+        while(j>0 && (j==len1 || s1[i]!=s2[j+1])) j = nex[j];
+        if(s1[i]==s2[j+1]) j++;
+        f[i] = j;
+        if(f[i] == len2) cout<<i-len2+1<<'\n';
+    }
+    for(int i = 1; i<=len2; i++) cout<<nex[i]<<' ';
+    return 0;
+}
+```
+
+# AC自动机
+1. 统计有多少模版串在文本串中出现过
+```
+#include<bits/stdc++.h>
+using namespace std;
+
+const int N = 2000010;
+
+int ch[N][30],nex[N],cnt[N],idx;
+int n;
+
+void insert(string s) {
+    int p = 0;
+    for(int i = 0; i<s.length(); i++) {
+        int j = s[i] - 'a';
+        if(!ch[p][j]) ch[p][j] = ++idx;
+        p = ch[p][j];
+    }
+    cnt[p]++;
+}
+
+void build() {
+    queue<int>qu;
+    for(int i = 0;i<26; i++) {
+        if(ch[0][i]) qu.push(ch[0][i]);
+    }
+    while(!qu.empty()) {
+        int u = qu.front();qu.pop();
+        for(int i = 0; i<26; i++) {
+            int v = ch[u][i];
+            if(v) nex[v] = ch[nex[u]][i],qu.push(v);
+            else ch[u][i] = ch[nex[u]][i];
+        }
+    }
+}
+
+int query(string s) {
+    int res = 0;
+    for(int k = 0, i = 0; k<s.length(); k++) {
+        i = ch[i][s[k]-'a'];
+        for(int j = i; j&&~cnt[j];j=nex[j]) {
+            res+=cnt[j], cnt[j]=-1;
+        }
+    }
+    return res;
+}
+
+int main() {
+    cin>>n;
+    for(int i = 1; i<=n; i++) {
+        string s;cin>>s;
+        insert(s);
+    }
+    build();
+    string s;
+    cin>>s;
+    int ans = query(s);
+    cout<<ans<<endl;
+    return 0;
+}
+```
+2. 统计每一个模版串在文本串中出现了多少次
