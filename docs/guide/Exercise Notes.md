@@ -262,3 +262,72 @@ int main() {
 }
 ```
 - 复盘: 当时看到区间最值只想到线段树和ST表,没有考虑到这题两个区间的边界都有一边固定
+
+### <a href="https://www.lanqiao.cn/problems/3529/learning/" target="_blank" rel="noreferrer">太阳</a>
+- 标签: 计算几何,区间合并
+- 来源: 蓝桥杯
+- 题目大意: 给定一个点(太阳)的坐标,给出n个与x轴平行的线段,求有多少个线段能被太阳照到
+- 核心思路:
+    - 因为太阳在上面,所以把线段按y降序排列
+    - 枚举每一个线段,计算出左右端点与太阳的连线与y轴的夹角,如果这个线段的夹角在之前的线段的夹角范围内,说明这个线段被之前的线段遮挡了,否则说明这个线段能被太阳照到,更新夹角范围
+    - 这里涉及到区间合并的问题,请看代码
+- 核心代码:
+```cpp
+#include<bits/stdc++.h>
+using namespace std;
+
+const int N = 100010;
+
+int n;
+struct Node{
+    int x,y,l;
+    bool operator<(Node &o) {
+        return y>o.y;
+    }
+}p[N];
+double sunx,suny;
+int ans;
+map<double,double>mp;
+
+int addline(double x,double y) {
+    int res = 1; 
+    auto it1 = mp.upper_bound(x);
+    auto it2 = mp.upper_bound(y);
+    if(it1!=mp.begin() && (--it1)++->second>=y) {
+        res = 0;
+    } else {
+        if(it1!=mp.begin()) {
+            it1--;
+            if(it1->second>=x) x = it1->first;
+            else it1++;
+        }
+
+        if(it2!=mp.begin()) {
+            it2--;
+            if(it2->second>=y) y = it2->second;
+            it2++;
+        }
+        mp.erase(it1,it2);
+        mp.insert({x,y});
+    }
+    return res;
+}
+
+int main() {
+    cin>>n>>sunx>>suny;
+    for(int i = 1; i<=n; i++) {
+        cin>>p[i].x>>p[i].y>>p[i].l;
+    }
+    sort(p+1,p+1+n);
+    for(int i = 1;i<=n;i++) {
+        double deg1 = atan((p[i].x-sunx)/(suny-p[i].y));
+        double deg2 = atan((p[i].x+p[i].l-sunx)/(suny-p[i].y));
+        // cout<<i<<' '<<deg1<<' '<<deg2<<endl;
+        if(addline(deg1,deg2)) {
+            ans++;
+        }
+    }
+    cout<<ans<<endl;
+    return 0;
+}
+```

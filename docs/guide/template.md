@@ -1,5 +1,6 @@
 # 高精度
 需要哪个敲哪个,非常方便,建议熟读背诵(~~我们程序员都是每天手抄背诵模版的~~)
+低索引对应的是低位
 ```
 #include <bits/stdc++.h>
 using namespace std;
@@ -187,3 +188,113 @@ int main() {
 }
 ```
 2. 统计每一个模版串在文本串中出现了多少次
+```
+#include<bits/stdc++.h>
+using namespace std;
+
+const int MAXN = 1000010;  // Trie 节点总数，根据所有模式串长度之和调整
+const int MAXM = 200010;   // 模式串的最大个数
+
+int ch[MAXN][26];          // Trie 树转移边
+int nex[MAXN];             // fail 指针
+int cnt[MAXN];             // 节点作为模式串结尾的权重（处理重复模式串）
+int tmp_count[MAXN];       // 统计每个节点被经过的次数
+int end_node[MAXM];        // 记录第 i 个模式串在 Trie 树上的结尾节点编号
+int idx = 0;               // Trie 节点计数器
+vector<int> bfs_seq;       // 保存 BFS 遍历顺序，用于后续反向累加
+int n;
+
+// 插入模式串
+void insert(const string& s, int id) {
+    int p = 0;
+    for(char c : s) {
+        int j = c - 'a';
+        if(!ch[p][j]) ch[p][j] = ++idx;
+        p = ch[p][j];
+    }
+    cnt[p]++;              // 标记该节点为模式串结尾
+    end_node[id] = p;      // 记录第 id 个模式串的结尾节点
+}
+
+// 构建 AC 自动机（包含 fail 指针和转移图优化）
+void build() {
+    queue<int> q;
+    bfs_seq.clear();
+    
+    // 初始化第一层节点
+    for(int i = 0; i < 26; i++) {
+        if(ch[0][i]) {
+            q.push(ch[0][i]);
+            bfs_seq.push_back(ch[0][i]);
+        }
+    }
+    
+    // BFS 构建 fail 指针
+    while(!q.empty()) {
+        int u = q.front(); q.pop();
+        for(int i = 0; i < 26; i++) {
+            int v = ch[u][i];
+            if(v) {
+                nex[v] = ch[nex[u]][i];  // 存在子节点，设置 fail 指针
+                q.push(v);
+                bfs_seq.push_back(v);    // 记录 BFS 顺序
+            } else {
+                ch[u][i] = ch[nex[u]][i]; // 转移图优化，直接指向 fail 的对应子节点
+            }
+        }
+    }
+}
+
+// 查询文本串，统计每个模式串出现次数
+void solve_query(const string& s) {
+    int p = 0;
+    
+    // 第一步：让文本串在自动机上跑一遍，统计每个节点被经过的次数
+    for(char c : s) {
+        p = ch[p][c - 'a'];
+        tmp_count[p]++;
+    }
+    
+    // 第二步：沿 fail 指针反向累加（从深度深到深度浅）
+    // bfs_seq 是按深度从小到大排列的，倒序遍历即可
+    for(int i = (int)bfs_seq.size() - 1; i >= 0; i--) {
+        int u = bfs_seq[i];
+        if(nex[u]) {
+            tmp_count[nex[u]] += tmp_count[u];
+        }
+    }
+}
+
+int main() {
+    // 加速输入输出
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+    
+    // 读入模式串个数
+    if(!(cin >> n)) return 0;
+    
+    // 读入 n 个模式串
+    for(int i = 1; i <= n; i++) {
+        string s;
+        cin >> s;
+        insert(s, i);
+    }
+    
+    // 构建 AC 自动机
+    build();
+    
+    // 读入文本串
+    string text;
+    cin >> text;
+    
+    // 查询并统计
+    solve_query(text);
+    
+    // 输出每个模式串出现的次数
+    for(int i = 1; i <= n; i++) {
+        cout << tmp_count[end_node[i]] << "\n";
+    }
+    
+    return 0;
+}
+```
