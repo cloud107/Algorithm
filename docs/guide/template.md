@@ -116,7 +116,7 @@ int main() {
     }
     for(int i = 1, j = 0; i<=len1; i++) {
         // cout<<j<<" "<<nex[j]<<endl;
-        while(j>0 && (j==len1 || s1[i]!=s2[j+1])) j = nex[j];
+        while(j>0 && (j==len2 || s1[i]!=s2[j+1])) j = nex[j];
         if(s1[i]==s2[j+1]) j++;
         f[i] = j;
         if(f[i] == len2) cout<<i-len2+1<<'\n';

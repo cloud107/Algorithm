@@ -331,3 +331,89 @@ int main() {
     return 0;
 }
 ```
+
+### <a href="https://www.lanqiao.cn/problems/3512/learning/" target="_blank" rel="noreferrer">接龙数列</a>
+- 标签: 动态规划
+- 来源: 蓝桥杯
+- 题目描述: 给定一个数列,如果一个数的末尾和下一个数的开头相同,就可以把它们接在一起,最少删除多少个数能使给出的数列变成接龙数列
+- 核心思路:
+    - dp[i]表示以i(注意不是a[i])结尾的接龙数列的最大接龙数列长度
+    - 依次枚举数列中的每一个数a[i],对于每一个数a[i],我们枚举它的开头数字和结尾数字,假设开头数字为x,结尾数字为y,我们就把dp[y]更新为max(dp[y],dp[x]+1),最后答案就是n-max(dp[i])中的最大值
+- 核心代码:
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int dp[10];
+
+int main()
+{
+  // 请在此输入您的代码
+  int n;
+  cin>>n;
+  string s;
+  int m=0;
+  for(int i=0;i<n;++i){
+    cin>>s;
+    int x=s[0]-'0',y=s[s.size()-1]-'0';
+    dp[y]=max(dp[x]+1,dp[y]);
+    m=max(m,dp[y]);
+  }
+  cout<<n-m<<endl;
+  return 0;
+}
+```
+
+### <a href="https://www.lanqiao.cn/problems/3512/learning/" target="_blank" rel="noreferrer">接龙数列</a>
+- 标签: dfs
+- 来源: 蓝桥杯
+- 题目描述: 给定一个地图,1表示陆地,0表示水域,如果陆地连成一个环,其中的岛屿属于外围的子岛屿,不参与计数,求出这个地图上有多少个岛屿
+- 核心思路:
+    - 把地图向外扩展一圈水,从(0,0)开始dfs,把所有能访问到的水域都标记为访问过,同时搜到陆地时进行联通分量的计数,最后的答案就是联通分量的数量
+- 核心代码:
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+const int N = 60;
+char c;
+int g[N][N], n, m, res,t;
+int dx[4] = {0, 0, 1, -1},dy[4] = {1, -1, 0, 0};
+bool st[N][N];
+void dfs_1(int r,int c){
+  st[r][c]=true;
+  for(int k=0;k<4;k++){
+    int x=dx[k]+r,y=dy[k]+c;
+    if(st[x][y]||g[x][y]==0) continue;
+    dfs_1(x,y);
+  }
+}
+void dfs_0(int r,int c){
+  st[r][c]=true;
+  for(int i=-1;i<=1;i++){
+    for(int j=-1;j<=1;j++){
+      int x=r+i,y=c+j;
+      if(x<0||x>n+1||y<0||y>m+1||st[x][y]) continue;//越界+走过
+      if(g[x][y]==0)dfs_0(x,y);//仍是海
+      else dfs_1(x,y),res++;//岛屿
+    }
+  }
+}
+int main () {
+    cin>>t;
+    while(t--){
+      memset(g,0,sizeof g);
+      memset(st,false,sizeof st);
+      res=0;
+      cin>>n>>m;
+      for(int i=1;i<=n;i++)
+        for(int j=1;j<=m;j++){
+          cin>>c;
+          g[i][j]=c-'0';
+        }
+        dfs_0(0,0);//从外海开始遍历
+        cout<<res<<'\n';
+    }
+    return 0;
+}
+```
