@@ -55,6 +55,7 @@
     ```
     void floyd() {
         memset(d,0x3f,sizeof(d));
+        // 初始化d[i][j]为边权,如果没有边则为无穷大
         for(int i = 1;i<=n;i++) d[i][i] = 0;
         for(int k = 1;k<=n;k++) {
             for(int i = 1;i<=n;i++) {
